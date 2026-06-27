@@ -7,6 +7,8 @@
 | **Plataforma**      | Hack The Box  |
 | **Sistema Operacional** | Linux     |
 
+![](Assets/SmartHire-capa.png)
+
 # Reconhecimento
 
 Iniciamos com uma enumeração do host, utilizando o Nmap afim de identificar serviços expostos e portas ativas.
