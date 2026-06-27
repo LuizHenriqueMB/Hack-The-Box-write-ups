@@ -2,7 +2,7 @@
 
 ---
 
-<img src="Pasted image 20260623112241.png" width="300" align="right">
+<img src="https://cdn.services-k8s.prod.aws.htb.systems/content/machines/avatar/a1c58333-5cc9-413e-ac18-c38bbfe4a21e-1778696818.png" width="300" align="right">
 Máquina: SmartHire
 Dificuldade: Média
 Plataforma: Hack The Box
