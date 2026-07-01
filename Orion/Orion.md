@@ -1,6 +1,5 @@
 # CTF Orion | Hack The Box
 
-
 | Máquina             | Orion        |
 | ------------------- | ------------ |
 | Dificuldade         | Fácil        |
@@ -8,7 +7,6 @@
 | Sistema Operacional | Linux        |
 
 ![](Assets/Orion-capa.png)
-
 # Reconhecimento
 
 Iniciamos com uma enumeração do host, utilizando o Nmap afim de identificar serviços expostos e portas ativas.
