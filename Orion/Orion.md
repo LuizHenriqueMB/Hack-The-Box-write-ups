@@ -1,8 +1,4 @@
-#Hack-The-Box 
-
----
-
-<img src="Pasted image 20260630205725.png" width="300" align="right">
+# Orion
 
 | Máquina             | Orion        |
 | ------------------- | ------------ |
@@ -10,7 +6,7 @@
 | Plataforma          | Hack The Box |
 | Sistema Operacional | Linux        |
 
-
+![](Assets/Orion-capa.png)
 
 # Reconhecimento
 
@@ -22,7 +18,7 @@ nmap -p- --min-rate 1600 -sVC -Pn --open 10.129.244.146
 
 Obtendo as portas:
 
-![[Orion.png]]
+![](Assets/Orion.png)
 
 Com o retorno do scan, identificamos o domínio `orion.htb` onde adicionamos ao arquivo `/etc/hosts`. 
 
@@ -32,11 +28,11 @@ echo "10.129.244.146 orion.htb" | sudo tee -a /etc/hosts
 
 Ao navegarmos para o domínio, nos deparamos com uma aplicação web.
 
-![[Orion2.png]]
+![](Assets/Orion2.png)
 
 Analisando a aplicação, identificamos que no final da página é mostrado o Content Management System que está rodando na aplicação
 
-![[Orion3.png]]
+![](Assets/Orion3.png)
 
 # Enumeração
 
@@ -48,11 +44,11 @@ ffuf -u http://orion.htb/FUZZ -w SecLists/Discovery/Web-Content/big.txt -t 160 -
 
 Retornando o diretório `admin`: 
 
-![[Orion4.png]]
+![](Assets/Orion4.png)
 
 Ao navegarmos até o diretório `/admin`, encontramos a tela de login do `Craft CMS` e identificamos que a versão desse Content Management System era a `5.6.16`
 
-![[Orion5.png]]
+![](Assets/Orion5.png)
 
 Com a versão do `Craft CMS`, realizamos uma busca por quais vulnerabilidades essa versão possui. Encontrando a `CVE-2025-32432` em que permite `Remote Code Execution` sem autenticação.
 
@@ -68,7 +64,7 @@ Para explorarmos essa vulnerabilidade, pesquisamos por exploits através do `met
 exploit/linux/http/craftcms_preauth_rce_cve_2025_32432
 ```
 
-![[Orion6.png]]
+![](Assets/Orion6.png)
 
 Após habilitarmos a estrutura `shell` e estabilizarmos ela com esses comandos:
 
@@ -79,11 +75,11 @@ export TERM=xterm
 
 Percebemos que estamos como usuário `www-data`, assim iniciamos uma análise pelo servidor. 
 
-![[Orion7.png]]
+![](Assets/Orion7.png)
 
 Em seguida, encontramos um arquivo `.env` no diretório `/craft`.
 
-![[Orion8.png]]
+![](Assets/Orion8.png)
 
 Acessando o arquivo, encontramos credenciais para acessar o banco de dados `MySQL`.
 
@@ -102,7 +98,7 @@ Com essa credencial, acessamos o banco de dados.
 mysql -u root -p orion
 ```
 
-![[Orion9.png]]
+![](Assets/Orion9.png)
 
 Ao encontrarmos a tabela `users`, identificamos uma `hash` que continha a senha do usuário `Adam`
 
@@ -110,7 +106,7 @@ Ao encontrarmos a tabela `users`, identificamos uma `hash` que continha a senha 
  SELECT * FROM users;
  ```
 
-![[Orion10.png]]
+![](Assets/Orion10.png)
 
 Para descriptografar essa hash, utilizamos a ferramenta `Hashcat` 
 
@@ -118,11 +114,11 @@ Para descriptografar essa hash, utilizamos a ferramenta `Hashcat`
 hashcat -m 3200 hash.txt /usr/share/wordlists/rockyou.txt
 ```
 
-![[Orion11.png]]
+![](Assets/Orion11.png)
 
 Em seguida, conseguimos acessar o serviço via `SSH` e obter a user flag!
 
-![[Orion12.png]]
+![](Assets/Orion12.png)
 
 # Escalação de Privilégio
 
@@ -132,7 +128,7 @@ Verificando se há alguma porta aberta que não esteja rodando externamente, ide
 netstat -tulnp
 ```
 
-![[Orion13.png]]
+![](Assets/Orion13.png)
 
 Em seguida, checamos a versão do `telnet` para que possamos buscar alguma vulnerabilidade que nos leve a escalação privilégio
 
@@ -140,7 +136,7 @@ Em seguida, checamos a versão do `telnet` para que possamos buscar alguma vulne
 telnet --version
 ```
 
-![[Orion14.png]]
+![](Assets/Orion14.png)
 
 Encontramos a `CVE-2026-24061` que permite o bypass de autenticação remota através de um valor de `"-f root"` para a variável de ambiente do `USER`. 
 
@@ -154,9 +150,8 @@ Então para explorar essa vulnerabilidade, basta executar esse comando:
 USER="-f root" telnet -a 127.0.0.1
 ```
 
-![[Orion15.png]]
+![](Assets/Orion15.png)
 
 E obtemos a root flag! 
 
-![[Orion16.png]]
-
+![](Assets/Orion16.png)
