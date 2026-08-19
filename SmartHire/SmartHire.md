@@ -30,7 +30,7 @@ Navegando até o domínio, nos deparamos com uma aplicação web
 ![](Assets/SmartHire02.png)
 # Enumeração
 
-Em seguida, decidimos fazer um **fuzzing** de subdomínios utilizando a ferramenta **Gobuster**, para descobrirmos subdomínios ocultos.
+Em seguida, decidimos fazer um **fuzzing** de subdomínios utilizando a ferramenta **ffuf**, para descobrirmos subdomínios ocultos.
 
 ```shell
 ffuf -u http://FUZZ.smarthire.htb/ -H "Host: FUZZ.smarthire.htb" -w SecLists/Discovery/DNS/subdomains-top1million-20000.txt -t 160
