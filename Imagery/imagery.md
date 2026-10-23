@@ -1,9 +1,5 @@
 # CTF Imagery | Hack The Box
 
-Máquina: Imagery  
-Dificuldade: Média
-Plataforma: Hack The Box
-
 ![](images/image.png)
 
 # Reconhecimento
