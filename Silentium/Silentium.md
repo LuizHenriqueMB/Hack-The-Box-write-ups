@@ -1,10 +1,5 @@
 # CTF Silentium | Hack The Box
 
-Máquina: Silentium  
-Dificuldade: Fácil  
-Plataforma: Hack The Box
-
-
 ![](https://miro.medium.com/v2/resize:fit:700/1*WH3oCgwPtcFwvZSKqVlQTw.jpeg)
 
 # Reconhecimento
