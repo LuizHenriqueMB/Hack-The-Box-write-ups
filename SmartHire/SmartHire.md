@@ -1,12 +1,5 @@
 # CTF SmartHire | Hack The Box
 
-| Campo               | Detalhe       |
-| ------------------- | ------------- |
-| **Máquina**         | SmartHire     |
-| **Dificuldade**     | Média         |
-| **Plataforma**      | Hack The Box  |
-| **Sistema Operacional** | Linux     |
-
 ![](Assets/SmartHire-capa.png)
 
 # Reconhecimento
