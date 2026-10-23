@@ -1,11 +1,5 @@
 # CTF Orion | Hack The Box
 
-| Máquina             | Orion        |
-| ------------------- | ------------ |
-| Dificuldade         | Fácil        |
-| Plataforma          | Hack The Box |
-| Sistema Operacional | Linux        |
-
 ![](Assets/Orion-capa.png)
 # Reconhecimento
 
